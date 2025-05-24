@@ -22,21 +22,22 @@ function setupScene() {
     console.log('Fog added:', scene.fog);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
     console.log('Ambient light added:', ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(0, 5, 5);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
     directionalLight.shadow.camera.near = 0.5;
     directionalLight.shadow.camera.far = 50;
+    directionalLight.shadow.radius = 8;
     scene.add(directionalLight);
     console.log('Directional light added:', directionalLight);
 
-    // Stars (faint twinkling effect)
+    // Stars
     const starGeometry = new THREE.BufferGeometry();
     const starCount = 1000;
     const positions = new Float32Array(starCount * 3);
@@ -49,13 +50,13 @@ function setupScene() {
         colors[i * 3] = 1;
         colors[i * 3 + 1] = 1;
         colors[i * 3 + 2] = 1;
-        sizes[i] = Math.random() * 2 + 1;
+        sizes[i] = Math.random() * 0.2 + 0.1;
     }
     starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     starGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
     const starMaterial = new THREE.PointsMaterial({
-        size: 2,
+        size: 0.2,
         sizeAttenuation: true,
         vertexColors: true,
         transparent: true,
@@ -66,12 +67,17 @@ function setupScene() {
     scene.add(stars);
     console.log('Stars added, count:', starCount, 'visible:', stars.visible);
 
-    // Floor (white tiles, 1m square)
+    // Floor
     const tileTexture = new THREE.TextureLoader().load('images/whitetile1.webp');
     tileTexture.wrapS = tileTexture.wrapT = THREE.RepeatWrapping;
     tileTexture.repeat.set(100, 100);
     const floorGeometry = new THREE.PlaneGeometry(100, 100);
-    const floorMaterial = new THREE.MeshStandardMaterial({ map: tileTexture, color: 0xffffff });
+    const floorMaterial = new THREE.MeshStandardMaterial({ 
+        map: tileTexture, 
+        color: 0xdddddd, // Slightly darker white
+        roughness: 0.8,
+        metalness: 0.0
+    });
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
